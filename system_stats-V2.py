@@ -1,27 +1,26 @@
 #!/usr/bin/env python3
-
 # -*- coding: utf-8 -*-
-
 """""
 6/12/2018
-
 @author: wayne
-
 """""
 
-#import shutil
 import time
 import os
-#import subprocess
 import sys
 import psutil
 import socket
 from psutil._common import bytes2human
+from ping3 import ping
 
 class color:
         BOLD = '\033[1m'
         END = '\033[0m'
         RED = '\033[91m'
+        BLUE = '\033[94m'
+        CYAN = '\033[96m'
+        GREEN = '\033[92m'
+        YELLOW = '\033[93m'
 
 menu_options = {
     1: 'Free Memory',
@@ -46,13 +45,13 @@ def ram():
     # Getting % usage of virtual_memory ( 3rd field)
     tRAM = psutil.virtual_memory()[0]/1024/1024/1024
     aRAM = psutil.virtual_memory()[1]/1024/1024/1024
-    print (color.BOLD + 'RAM Usage:' + color.END)
+    print (color.BLUE + 'RAM Usage:' + color.END)
     print ('Total RAM: ', round((tRAM),2),'GB' )
     print ('Avalible RAM: ', round((aRAM), 2),'GB')
     print ('RAM Used is: ', psutil.virtual_memory()[2], '%')
 
 def parttition():
-    print (color.BOLD + 'Disk Usage:' + color.END)
+    print (color.BLUE + 'Disk Usage:' + color.END)
     templ = "%-17s %8s %8s %8s %5s%% %9s  %s"
     print(templ % ("Device", "Total", "Used", "Free", "Use ", "Type","Mount"))
     for part in psutil.disk_partitions(all=False):
@@ -76,18 +75,24 @@ def swap_fn():
         tSWAP = psutil.swap_memory()[0]/1024/1024/1024
         uSWAP = psutil.swap_memory()[1]/1024/1024/1024
         fSWAP = psutil.swap_memory()[2]/1024/1024/1024
-        print (color.BOLD + 'SWAP Usage:' + color.END)
+        print (color.BLUE + 'SWAP Usage:' + color.END)
         print ('Total SWAP: ',round((tSWAP),2),'GB')
         print ('Used SWAP: ',round((uSWAP),2),'GB')
         print ('Free SWAP: ',round((fSWAP),2),'GB')
 
 def ping_fn():
-        server=input("Enter Server Name for Ping Test: ")
-        print('\n')
-        ping = os.system("ping -c 5 "+server)
+        print (color.BLUE + 'Ping Test:' + color.END)
+        server = input("Enter Server Name for Ping Test: ")
+        #print('\n')
+        resp = ping(server)
+        if resp == False:
+            print(color.RED + server,'ping failed' + color.END)
+        else:
+            print (server,'is active')
+            print('responce time',resp)
 
 def sys_load_avg():
-    print (color.BOLD + 'Load Avg:' + color.END)
+    print (color.BLUE + 'Load Avg:' + color.END)
     sysload5 = psutil.getloadavg()[0]
     sysload10 = psutil.getloadavg()[1]
     sysload15 = psutil.getloadavg()[2]
@@ -98,29 +103,15 @@ def sys_load_avg():
 def clear():
     os.system('clear')
 
-def sysover():
-    os.system('clear')
-    print(color.BOLD + 'System Information:' + color.END)
-    os.system('top -u mysqladm -n 1 -b -m')
-    print('')
-    free_fn()
-    print('')
-    swap_fn()
-    print('')
-    df_fn()
-    print('')
-    print(color.BOLD + 'MySQL Information:' + color.END)
-    os.system('mysqladmin --socket=/home/mysqladm/tmp/mysql.sock status processlist')
-
 if __name__=='__main__':
     clear()
     while(True):
-        print(color.BOLD + 'OS Toolbox' + color.END)
+        print(color.YELLOW + 'OS Toolbox' + color.END)
         print (HOST, "has:", psutil.cpu_count(), "CPU's")
         print ('CPU Freq', psutil.cpu_freq()[2], "GHz")
         print ('Python Version is:',sys.version[0:5])
         print('Date and Time:',time.asctime())
-        print('\nChoose Option: \n')
+        print(color.YELLOW + '\nChoose Option:' + color.END)
         print_menu()
         option = ''
         try:
@@ -145,6 +136,8 @@ if __name__=='__main__':
             sys_load_avg()
             print('')
         elif option == 5:
+            clear()
+            ping_fn()
             print('')
         elif option == 6:
             print(color.BOLD + 'System Information:' + color.END)
@@ -163,9 +156,3 @@ if __name__=='__main__':
              exit()
         else:
              print('Invalid option. Please enter a number between 0 and 9.')
-
-            #'print('OS Toolbox\n')',
-            #'print (HOST, "has:", psutil.cpu_count(), "CPU's")',
-            #'print ('Python Version is:',sys.version[0:5])',
-            #'print('Date and Time:',time.asctime())',
-            #'print('\nChoose Option: \n')'
