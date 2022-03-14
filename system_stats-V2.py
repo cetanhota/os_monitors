@@ -49,7 +49,7 @@ def ram():
     print ('Total RAM: ', round((tRAM),2),'GB' )
     print ('Avalible RAM: ', round((aRAM), 2),'GB')
     print ('RAM Used is: ', psutil.virtual_memory()[2], '%')
-
+    
 def parttition():
     print (color.BLUE + 'Disk Usage:' + color.END)
     templ = "%-17s %8s %8s %8s %5s%% %9s  %s"
@@ -64,6 +64,7 @@ def parttition():
             int(usage.percent),
             part.fstype,
             part.mountpoint))
+            
 
 def swap_fn():
         tSWAP = psutil.swap_memory()[0]/1024/1024/1024
@@ -73,6 +74,7 @@ def swap_fn():
         print ('Total SWAP: ',round((tSWAP),2),'GB')
         print ('Used SWAP: ',round((uSWAP),2),'GB')
         print ('Free SWAP: ',round((fSWAP),2),'GB')
+        
 
 def ping_fn():
         print (color.BLUE + 'Ping Test:' + color.END)
@@ -121,18 +123,22 @@ if __name__=='__main__':
              clear()
              parttition()
              print ('')
+             input("Press Enter to return to menu.")
         elif option == 3:
             clear()
             swap_fn()
             print('')
+            input("Press Enter to return to menu.")
         elif option == 4:
             clear()
             sys_load_avg()
             print('')
+            input("Press Enter to return to menu.")
         elif option == 5:
             clear()
             ping_fn()
             print('')
+            input("Press Enter to return to menu.")
         elif option == 6:
             print(color.BOLD + 'System Information:' + color.END)
             print('')
@@ -144,6 +150,7 @@ if __name__=='__main__':
             print('')
             parttition()
             print('')
+            input("Press Enter to return to menu.")
         elif option == 0:
              clear()
              print('Have a Nice Day!')
