@@ -29,6 +29,7 @@ menu_options = {
     4: 'System Load Average',
     5: 'Network Latency Check',
     6: 'System Overview',
+    7: 'CPU Percent',
     0: 'Exit'
 }
 
@@ -75,7 +76,6 @@ def swap_fn():
         print ('Used SWAP: ',round((uSWAP),2),'GB')
         print ('Free SWAP: ',round((fSWAP),2),'GB')
         
-
 def ping_fn():
         print (color.BLUE + 'Ping Test:' + color.END)
         server = input("Enter Server Name for Ping Test: ")
@@ -98,6 +98,13 @@ def sys_load_avg():
 
 def clear():
     os.system('clear')
+
+def check_cpu_percent():
+    print (color.BLUE + 'CPU Percent:' + color.END)
+    percent=psutil.cpu_percent()
+    print ('CPU Usage:',percent,'%')
+    if percent > 80:
+        print ('ERROR CPU Percent is greater than 80% ',percent,'%')
 
 if __name__=='__main__':
     clear()
@@ -142,6 +149,8 @@ if __name__=='__main__':
         elif option == 6:
             print(color.BOLD + 'System Information:' + color.END)
             print('')
+            check_cpu_percent()
+            print('')
             ram()
             print('')
             sys_load_avg()
@@ -151,9 +160,16 @@ if __name__=='__main__':
             parttition()
             print('')
             input("Press Enter to return to menu.")
+        elif option == 7:
+            print(color.BOLD + 'CPU Usage:' + color.END)
+            clear()
+            print('')
+            check_cpu_percent()
+            print('')
+            input("Press Enter to return to menu.")
         elif option == 0:
              clear()
              print('Have a Nice Day!')
              exit()
         else:
-             print('Invalid option. Please enter a number between 0 and 9.')
+             print('Invalid option. Please enter a number between 0 and 7.')
