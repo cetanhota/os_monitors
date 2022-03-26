@@ -46,12 +46,17 @@ def ram():
     # Getting % usage of virtual_memory ( 3rd field)
     tRAM = psutil.virtual_memory()[0]/1024/1024/1024
     aRAM = psutil.virtual_memory()[1]/1024/1024/1024
+    uRAM = psutil.virtual_memory()[2]
     print (color.BLUE + 'RAM Usage:' + color.END)
     print ('Total RAM: ', round((tRAM),2),'GB' )
     print ('Avalible RAM: ', round((aRAM), 2),'GB')
-    print ('RAM Used is: ', psutil.virtual_memory()[2], '%')
     
-def parttition():
+    if uRAM > 80:
+        print('ERROR: RAM usage is:',uRAM,'%')
+    else:
+        print ('RAM Used is: ', uRAM, '%')
+    
+def partition():
     print (color.BLUE + 'Disk Usage:' + color.END)
     templ = "%-17s %8s %8s %8s %5s%% %9s  %s"
     print(templ % ("Device", "Total", "Used", "Free", "Use ", "Type","Mount"))
@@ -94,7 +99,10 @@ def sys_load_avg():
     sysload15 = psutil.getloadavg()[2]
     print ('5 min Load Avg:', round((sysload5),2))
     print ('10 min Load Avg:', round((sysload10),2))
-    print ('15 min Load Avg:', round((sysload15),2))
+    if sysload15 > 4:
+        print('ERROR: Sysload Average:',sysload15)
+    else:
+        print ('15 min Load Avg:', round((sysload15),2))
 
 def clear():
     os.system('clear')
@@ -104,7 +112,7 @@ def check_cpu_percent():
     percent=psutil.cpu_percent()
     print ('CPU Usage:',percent,'%')
     if percent > 80:
-        print ('ERROR CPU Percent is greater than 80% ',percent,'%')
+        print ('ERROR: CPU Percent is greater than 80% ',percent,'%')
 
 if __name__=='__main__':
     clear()
@@ -128,7 +136,7 @@ if __name__=='__main__':
             print ('')
         elif option == 2:
              clear()
-             parttition()
+             partition()
              print ('')
              input("Press Enter to return to menu.")
         elif option == 3:
@@ -157,7 +165,7 @@ if __name__=='__main__':
             print('')
             swap_fn()
             print('')
-            parttition()
+            partition()
             print('')
             input("Press Enter to return to menu.")
         elif option == 7:
