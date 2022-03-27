@@ -50,12 +50,12 @@ def ram():
     print (color.BLUE + 'RAM Usage:' + color.END)
     print ('Total RAM: ', round((tRAM),2),'GB' )
     print ('Avalible RAM: ', round((aRAM), 2),'GB')
-    
+
     if uRAM > 80:
         print('ERROR: RAM usage is:',uRAM,'%')
     else:
         print ('RAM Used is: ', uRAM, '%')
-    
+
 def partition():
     print (color.BLUE + 'Disk Usage:' + color.END)
     templ = "%-17s %8s %8s %8s %5s%% %9s  %s"
@@ -70,7 +70,7 @@ def partition():
             int(usage.percent),
             part.fstype,
             part.mountpoint))
-            
+
 
 def swap_fn():
         tSWAP = psutil.swap_memory()[0]/1024/1024/1024
@@ -80,7 +80,7 @@ def swap_fn():
         print ('Total SWAP: ',round((tSWAP),2),'GB')
         print ('Used SWAP: ',round((uSWAP),2),'GB')
         print ('Free SWAP: ',round((fSWAP),2),'GB')
-        
+
 def ping_fn():
         print (color.BLUE + 'Ping Test:' + color.END)
         server = input("Enter Server Name for Ping Test: ")
@@ -99,7 +99,7 @@ def sys_load_avg():
     sysload15 = psutil.getloadavg()[2]
     print ('5 min Load Avg:', round((sysload5),2))
     print ('10 min Load Avg:', round((sysload10),2))
-    if sysload15 > 4:
+    if sysload15 > psutil.cpu_count():
         print('ERROR: Sysload Average:',sysload15)
     else:
         print ('15 min Load Avg:', round((sysload15),2))
