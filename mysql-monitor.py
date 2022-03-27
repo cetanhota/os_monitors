@@ -9,8 +9,8 @@ import mysql.connector
 mydb = mysql.connector.connect(
   host="192.168.1.61",
   auth_plugin='mysql_native_password',
-  user="pi",
-  password="hawk69"
+  user="",
+  password=""
 )
 
 mycursor = mydb.cursor()
