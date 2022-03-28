@@ -37,32 +37,21 @@ def print_menu():
         print (key, '--', menu_options[key] )
 HOST = socket.gethostname()
 
-#def print_menu():
-#    for key in menu_options.keys():
-#        print (key, '--', menu_options[key] )
-
 def clear():
     os.system('clear')
 
-def fn_mysql_connect():
-    mydb = mysql.connector.connect(
-    host="",
-    auth_plugin='mysql_native_password',
-    user="",
-    password="")
-    mycursor = mydb.cursor()
+mydb = mysql.connector.connect(
+host="192.168.1.61",
+auth_plugin='mysql_native_password',
+user="pi",
+password="hawk69")
+global mycursor
+mycursor = mydb.cursor()
 
 #version = mydb.get_server_info()
 #stats = mydb.cmd_statistics()
 
 def fn_processlist():
-    mydb = mysql.connector.connect(
-    host="",
-    auth_plugin='mysql_native_password',
-    user="",
-    password="")
-    mycursor = mydb.cursor()
-
     query = "show processlist"
     mycursor.execute(query)
     results = mycursor.fetchall()
