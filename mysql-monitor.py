@@ -60,6 +60,15 @@ def fn_processlist():
     print(tabulate(results, headers=field_names, tablefmt='fancy_grid'))
     mydb.close()
 
+def fn_connections():
+    query = "SELECT user usr,LEFT(host,LOCATE (':',host) - 1) hst FROM information_schema.processlist WHERE user NOT IN ('system user','root')) A GROUP BY usr,hst WITH ROLLUP"
+    mycursor.execute(query)
+    results = mycursor.fetchall()
+    field_names = [i[0] for i in mycursor.description]
+
+    print(tabulate(results, headers=field_names, tablefmt='fancy_grid'))
+    mydb.close()
+
 if __name__=='__main__':
     clear()
     while(True):
@@ -82,7 +91,7 @@ if __name__=='__main__':
             print ('')
         elif option == 2:
              clear()
-             partition()
+             fn_connections()
              print ('')
              input("Press Enter to return to menu.")
         elif option == 3:
