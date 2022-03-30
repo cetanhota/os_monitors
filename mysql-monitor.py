@@ -22,8 +22,8 @@ class color:
         YELLOW = '\033[93m'
 
 menu_options = {
-    1: 'Free Memory',
-    2: 'Disk Usage',
+    1: 'Show Processlist',
+    2: 'Total Connections',
     3: 'SWAP Usage',
     4: 'System Load Average',
     5: 'Network Latency Check',
@@ -61,7 +61,7 @@ def fn_processlist():
     mydb.close()
 
 def fn_connections():
-    query = "SELECT user usr,LEFT(host,LOCATE (':',host) - 1) hst FROM information_schema.processlist WHERE user NOT IN ('system user','root')) A GROUP BY usr,hst WITH ROLLUP"
+    query = "SELECT IFNULL(usr,'All Users') user,IFNULL(hst,'All Hosts') host,COUNT(1) Connections FROM ( SELECT user usr,LEFT(host,LOCATE (':',host) - 1) hst FROM information_schema.processlist WHERE user NOT IN ('system user','root')) A GROUP BY usr,hst WITH ROLLUP;"
     mycursor.execute(query)
     results = mycursor.fetchall()
     field_names = [i[0] for i in mycursor.description]
