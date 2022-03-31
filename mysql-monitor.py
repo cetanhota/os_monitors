@@ -24,7 +24,7 @@ class color:
 menu_options = {
     1: 'Show Processlist',
     2: 'Total Connections',
-    3: 'SWAP Usage',
+    3: 'Innodb buffer pool efficiency',
     4: 'System Load Average',
     5: 'Network Latency Check',
     6: 'System Overview',
@@ -58,7 +58,6 @@ def fn_processlist():
     field_names = [i[0] for i in mycursor.description]
 
     print(tabulate(results, headers=field_names, tablefmt='fancy_grid'))
-    mydb.close()
 
 def fn_connections():
     query = "SELECT IFNULL(usr,'All Users') user,IFNULL(hst,'All Hosts') host,COUNT(1) Connections FROM ( SELECT user usr,LEFT(host,LOCATE (':',host) - 1) hst FROM information_schema.processlist WHERE user NOT IN ('system user','root')) A GROUP BY usr,hst WITH ROLLUP;"
@@ -67,12 +66,28 @@ def fn_connections():
     field_names = [i[0] for i in mycursor.description]
 
     print(tabulate(results, headers=field_names, tablefmt='fancy_grid'))
-    mydb.close()
+
+def fn_bufferpool_eff():
+    mycursor.execute("select variable_value from performance_schema.global_status where variable_name = 'Innodb_buffer_pool_read_requests'")
+    bpoolrr = mycursor.fetchone()
+    for row1 in bpoolrr:
+        print ("Innodb_buffer_pool_read_requests:", row1)
+    mycursor.execute("select variable_value from performance_schema.global_status where variable_name = 'Innodb_buffer_pool_reads'")
+    bpoolr = mycursor.fetchone()
+    for row2 in bpoolr:
+        print ("innodb_buffer_pool_reads:", row2)
+    print()
+    print ("Efficiency is:", round(int(row2)/int(row1) * 100, 2), "% reads from disk.")
+
+def fn_main_menu():
+    print ('')
+    input("Press Enter to return to menu.")
+    clear()
 
 if __name__=='__main__':
     clear()
     while(True):
-        print(color.YELLOW + 'OS Toolbox' + color.END)
+        print(color.YELLOW + 'MySQL Monitor' + color.END)
         print (HOST, "has:", psutil.cpu_count(), "CPU's")
         print ('CPU Freq', psutil.cpu_freq()[2], "GHz")
         print ('Python Version is:',sys.version[0:5])
@@ -87,52 +102,54 @@ if __name__=='__main__':
         #Check what choice was entered and act accordingly
         if option == 1:
             clear()
+            print(color.BLUE + 'Buffer pool efficiency:' + color.END)
             fn_processlist()
-            print ('')
+            fn_main_menu()
         elif option == 2:
              clear()
+             print(color.BLUE + 'Buffer pool efficiency:' + color.END)
              fn_connections()
-             print ('')
-             input("Press Enter to return to menu.")
+             fn_main_menu()
         elif option == 3:
             clear()
-            swap_fn()
-            print('')
-            input("Press Enter to return to menu.")
+            print(color.BLUE + 'Buffer pool efficiency:' + color.END)
+            fn_bufferpool_eff()
+            fn_main_menu()
         elif option == 4:
             clear()
-            sys_load_avg()
+            
             print('')
             input("Press Enter to return to menu.")
         elif option == 5:
             clear()
-            ping_fn()
+           
             print('')
             input("Press Enter to return to menu.")
         elif option == 6:
             print(color.BOLD + 'System Information:' + color.END)
             print('')
-            check_cpu_percent()
+            
             print('')
-            ram()
+           
             print('')
-            sys_load_avg()
+            
             print('')
-            swap_fn()
+            
             print('')
-            partition()
+            
             print('')
             input("Press Enter to return to menu.")
         elif option == 7:
             print(color.BOLD + 'CPU Usage:' + color.END)
             clear()
             print('')
-            check_cpu_percent()
+            
             print('')
             input("Press Enter to return to menu.")
         elif option == 0:
              clear()
              print('Have a Nice Day!')
+             mydb.close()
              exit()
         else:
              print('Invalid option. Please enter a number between 0 and 7.')
