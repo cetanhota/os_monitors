@@ -24,7 +24,7 @@ class color:
 menu_options = {
     1: 'Show Processlist',
     2: 'Total Connections',
-    3: 'Innodb buffer pool efficiency',
+    3: 'Innodb Buffer Pool Information',
     4: 'System Load Average',
     5: 'Network Latency Check',
     6: 'System Overview',
@@ -68,16 +68,36 @@ def fn_connections():
     print(tabulate(results, headers=field_names, tablefmt='fancy_grid'))
 
 def fn_bufferpool_eff():
+    print()
     mycursor.execute("select variable_value from performance_schema.global_status where variable_name = 'Innodb_buffer_pool_read_requests'")
     bpoolrr = mycursor.fetchone()
     for row1 in bpoolrr:
         print ("Innodb_buffer_pool_read_requests:", row1)
+
     mycursor.execute("select variable_value from performance_schema.global_status where variable_name = 'Innodb_buffer_pool_reads'")
     bpoolr = mycursor.fetchone()
     for row2 in bpoolr:
         print ("innodb_buffer_pool_reads:", row2)
+
     print()
-    print ("Efficiency is:", round(int(row2)/int(row1) * 100, 2), "% reads from disk.")
+    print (color.YELLOW + "Innodb buffer pool efficiency is:", round(int(row2)/int(row1) * 100, 2), "% reads from disk." + color.END)
+    print()
+    mycursor.execute("select variable_value from performance_schema.global_status where variable_name = 'Innodb_buffer_pool_pages_total'")
+    pool_page_total = mycursor.fetchone()
+    for row3 in pool_page_total:
+        print ("Innodb_buffer_pool_pages_total:", row3)
+
+    mycursor.execute("select variable_value from performance_schema.global_status where variable_name = 'Innodb_buffer_pool_pages_free'")
+    pool_page_free = mycursor.fetchone()
+    for row4 in pool_page_free:
+        print ("Innodb_buffer_pool_pages_free:", row4)
+    bp_free = round(int(row4), 2)
+    bp_total = round(int(row3), 2)
+
+    x = (bp_total - bp_free) / bp_total
+    xy = round(x * 100, 2)
+    print()
+    print (color.YELLOW + "Buffer Pool Utilization: ", xy, "%" + color.END)
 
 def fn_main_menu():
     print ('')
@@ -102,48 +122,48 @@ if __name__=='__main__':
         #Check what choice was entered and act accordingly
         if option == 1:
             clear()
-            print(color.BLUE + 'Buffer pool efficiency:' + color.END)
+            print(color.BLUE + 'Processlist:' + color.END)
             fn_processlist()
             fn_main_menu()
         elif option == 2:
              clear()
-             print(color.BLUE + 'Buffer pool efficiency:' + color.END)
+             print(color.BLUE + 'Total Connections:' + color.END)
              fn_connections()
              fn_main_menu()
         elif option == 3:
             clear()
-            print(color.BLUE + 'Buffer pool efficiency:' + color.END)
+            print(color.BLUE + 'Buffer Pool Info:' + color.END)
             fn_bufferpool_eff()
             fn_main_menu()
         elif option == 4:
             clear()
-            
+
             print('')
             input("Press Enter to return to menu.")
         elif option == 5:
             clear()
-           
+
             print('')
             input("Press Enter to return to menu.")
         elif option == 6:
             print(color.BOLD + 'System Information:' + color.END)
             print('')
-            
+
             print('')
-           
+
             print('')
-            
+
             print('')
-            
+
             print('')
-            
+
             print('')
             input("Press Enter to return to menu.")
         elif option == 7:
             print(color.BOLD + 'CPU Usage:' + color.END)
             clear()
             print('')
-            
+
             print('')
             input("Press Enter to return to menu.")
         elif option == 0:
