@@ -48,9 +48,6 @@ password="hawk69")
 global mycursor
 mycursor = mydb.cursor()
 
-#version = mydb.get_server_info()
-#stats = mydb.cmd_statistics()
-
 def fn_processlist():
     query = "show processlist"
     mycursor.execute(query)
@@ -77,7 +74,7 @@ def fn_bufferpool_eff():
     mycursor.execute("select variable_value from performance_schema.global_status where variable_name = 'Innodb_buffer_pool_reads'")
     bpoolr = mycursor.fetchone()
     for row2 in bpoolr:
-        print ("innodb_buffer_pool_reads:", row2)
+        print ("Innodb_buffer_pool_reads:", row2)
 
     print()
     print (color.YELLOW + "Innodb buffer pool efficiency is:", round(int(row2)/int(row1) * 100, 2), "% reads from disk." + color.END)
