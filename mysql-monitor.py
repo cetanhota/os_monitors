@@ -78,6 +78,10 @@ def fn_connections():
     field_names = [i[0] for i in mycursor.description]
     print(tabulate(connection_errors, tablefmt='fancy_grid'))
 
+    mycursor.execute("SHOW GLOBAL STATUS LIKE 'Aborted_c%'")
+    connection_aborted = mycursor.fetchall()
+    field_names = [i[0] for i in mycursor.description]
+    print(tabulate(connection_aborted, tablefmt='fancy_grid'))
 
     #select variable_name,VARIABLE_VALUE from performance_schema.global_status where variable_name = 'Threads_running';
 
