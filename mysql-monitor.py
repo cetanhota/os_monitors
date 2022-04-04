@@ -23,7 +23,7 @@ class color:
 
 menu_options = {
     1: 'Show Processlist',
-    2: 'Total Connections',
+    2: 'Connections Info.',
     3: 'Innodb Buffer Pool Information',
     4: 'System Load Average',
     5: 'Network Latency Check',
@@ -61,8 +61,25 @@ def fn_connections():
     mycursor.execute(query)
     results = mycursor.fetchall()
     field_names = [i[0] for i in mycursor.description]
-
     print(tabulate(results, headers=field_names, tablefmt='fancy_grid'))
+
+    mycursor.execute("show global status like 'threads_connected'")
+    threads_connected = mycursor.fetchall()
+    field_names = [i[0] for i in mycursor.description]
+    print(tabulate(threads_connected, tablefmt='fancy_grid'))
+
+    mycursor.execute("show global status like 'threads_running'")
+    threads_running = mycursor.fetchall()
+    field_names = [i[0] for i in mycursor.description]
+    print(tabulate(threads_running, tablefmt='fancy_grid'))
+
+    mycursor.execute("SHOW GLOBAL STATUS LIKE 'Connection_errors%';")
+    connection_errors = mycursor.fetchall()
+    field_names = [i[0] for i in mycursor.description]
+    print(tabulate(connection_errors, tablefmt='fancy_grid'))
+
+
+    #select variable_name,VARIABLE_VALUE from performance_schema.global_status where variable_name = 'Threads_running';
 
 def fn_bufferpool_eff():
     print()
@@ -77,7 +94,7 @@ def fn_bufferpool_eff():
         print ("Innodb_buffer_pool_reads:", row2)
 
     print()
-    print (color.YELLOW + "Innodb buffer pool efficiency is:", round(int(row2)/int(row1) * 100, 2), "% reads from disk." + color.END)
+    print (color.YELLOW + "Only",round(int(row2)/int(row1) * 100, 2),"% of Buffer Pool reads come from disk." + color.END)
     print()
     mycursor.execute("select variable_value from performance_schema.global_status where variable_name = 'Innodb_buffer_pool_pages_total'")
     pool_page_total = mycursor.fetchone()
@@ -124,7 +141,7 @@ if __name__=='__main__':
             fn_main_menu()
         elif option == 2:
              clear()
-             print(color.BLUE + 'Total Connections:' + color.END)
+             print(color.BLUE + 'Connection Info:' + color.END)
              fn_connections()
              fn_main_menu()
         elif option == 3:
