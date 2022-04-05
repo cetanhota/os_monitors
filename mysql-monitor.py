@@ -23,12 +23,12 @@ class color:
 
 menu_options = {
     1: 'Show Processlist',
-    2: 'Connections Info.',
+    2: 'Connections Information',
     3: 'Innodb Buffer Pool Information',
-    4: 'System Load Average',
-    5: 'Network Latency Check',
-    6: 'System Overview',
-    7: 'CPU Percent',
+    4: 'Query Information',
+    5: 'Memory Usage',
+    6: '',
+    7: '',
     0: 'Exit'
 }
 
@@ -122,12 +122,33 @@ def fn_main_menu():
     input("Press Enter to return to menu.")
     clear()
 
+def fn_query():
+    mycursor.execute("select query,db,exec_count,err_count,total_latency,max_latency,avg_latency from sys.statement_analysis order by exec_count desc limit 15;")
+    com_insert = mycursor.fetchall()
+    field_names = [i[0] for i in mycursor.description]
+    print (color.YELLOW + 'Top 15 queries, based on executions count:' + color.END)
+    print(tabulate(com_insert, headers=field_names, tablefmt='fancy_grid'))
+
+def fn_memory_usage():
+    mycursor.execute("select * from sys.memory_global_total;")
+    memory_global_total = mycursor.fetchall()
+    field_names = [i[0] for i in mycursor.description]
+    print(tabulate(memory_global_total, headers=field_names, tablefmt='fancy_grid'))
+
+    mycursor.execute("select thread_id,HIGH_NUMBER_OF_BYTES_USED/1024/1024 'MB Used' from performance_schema.memory_summary_by_thread_by_event_name order by HIGH_NUMBER_OF_BYTES_USED desc limit 10")
+    memory_by_thread = mycursor.fetchall()
+    print(color.YELLOW + 'Memory Used per Thread:' + color.END)
+    field_names = [i[0] for i in mycursor.description]
+    print(tabulate(memory_by_thread, headers=field_names, tablefmt='fancy_grid'))
 if __name__=='__main__':
     clear()
     while(True):
         print(color.YELLOW + 'MySQL Monitor' + color.END)
-        print (HOST, "has:", psutil.cpu_count(), "CPU's")
-        print ('CPU Freq', psutil.cpu_freq()[2], "GHz")
+        mycursor.execute("select mysql_version from sys.version;")
+        version = mycursor.fetchall()
+        field_names = [i[0] for i in mycursor.description]
+        print(tabulate(version, headers=field_names, tablefmt='fancy_grid'))
+
         print ('Python Version is:',sys.version[0:5])
         print('Date and Time:',time.asctime())
         print(color.YELLOW + '\nChoose Option:' + color.END)
@@ -145,24 +166,25 @@ if __name__=='__main__':
             fn_main_menu()
         elif option == 2:
              clear()
-             print(color.BLUE + 'Connection Info:' + color.END)
+             print(color.BLUE + 'Connection Information:' + color.END)
              fn_connections()
              fn_main_menu()
         elif option == 3:
             clear()
-            print(color.BLUE + 'Buffer Pool Info:' + color.END)
+            print(color.BLUE + 'Buffer Pool Information:' + color.END)
             fn_bufferpool_eff()
             fn_main_menu()
         elif option == 4:
             clear()
-
-            print('')
-            input("Press Enter to return to menu.")
+            print(color.BLUE + 'Query Information:' + color.END)
+            fn_query()
+            fn_main_menu()
         elif option == 5:
             clear()
-
-            print('')
-            input("Press Enter to return to menu.")
+            print(color.BLUE + 'Memory Usage:' + color.END)
+            fn_memory_usage()
+            fn_main_menu()
+        
         elif option == 6:
             print(color.BOLD + 'System Information:' + color.END)
             print('')
