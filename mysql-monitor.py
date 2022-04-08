@@ -11,6 +11,7 @@ import time
 import os
 import psutil
 import sys
+import getopt
 
 class color:
         BOLD = '\033[1m'
@@ -37,14 +38,37 @@ def print_menu():
         print (key, '--', menu_options[key] )
 HOST = socket.gethostname()
 
+def myfunc(argv):
+    arg_server = ""
+    arg_user = ""
+    arg_password = ""
+    arg_help = "{0} -s <server> -u <user> -p <password>".format(argv[0])
+    
+    try:
+        opts, args = getopt.getopt(argv[1:], "hs:u:p:", ["help", "server=", 
+        "user=", "password="])
+    except:
+        print(arg_help)
+        sys.exit(2)
+        for opt, arg in opts:
+            if opt in ("-h", "--help"):
+                print(arg_help)  # print the help message
+                sys.exit(2)
+            elif opt in ("-s", "--server"):
+                arg_server = arg
+            elif opt in ("-u", "--user"):
+                arg_user = arg
+            elif opt in ("-p", "--password"):
+                arg_password = arg
+
 def clear():
     os.system('clear')
 
 mydb = mysql.connector.connect(
-host="192.168.1.61",
+host= '192.168.1.61',
 auth_plugin='mysql_native_password',
-user="pi",
-password="hawk69")
+user='pi',
+password='hawk69')
 global mycursor
 mycursor = mydb.cursor()
 
@@ -141,6 +165,7 @@ def fn_memory_usage():
     field_names = [i[0] for i in mycursor.description]
     print(tabulate(memory_by_thread, headers=field_names, tablefmt='fancy_grid'))
 if __name__=='__main__':
+    #myfunc(sys.argv)
     clear()
     while(True):
         print(color.YELLOW + 'MySQL Monitor' + color.END)
