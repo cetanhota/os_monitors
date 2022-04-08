@@ -147,11 +147,29 @@ def fn_main_menu():
     clear()
 
 def fn_query():
-    mycursor.execute("select query,db,exec_count,err_count,total_latency,max_latency,avg_latency from sys.statement_analysis order by exec_count desc limit 15;")
-    com_insert = mycursor.fetchall()
+    mycursor.execute("select query,db,exec_count,err_count,total_latency,max_latency,avg_latency from sys.statement_analysis where query not like '%commit%' order by exec_count desc limit 10")
+    exe_count = mycursor.fetchall()
     field_names = [i[0] for i in mycursor.description]
-    print (color.YELLOW + 'Top 15 queries, based on executions count:' + color.END)
-    print(tabulate(com_insert, headers=field_names, tablefmt='fancy_grid'))
+    print (color.YELLOW + 'Top 10 queries, based on execute count:' + color.END)
+    print(tabulate(exe_count, headers=field_names, tablefmt='fancy_grid'))
+
+    mycursor.execute("select variable_value as 'Questions' from performance_schema.global_status where variable_name = 'questions';")
+    questions = mycursor.fetchone()
+    field_names = [i[0] for i in mycursor.description]
+    #print(tabulate(questions, headers=field_names, tablefmt='fancy_grid'))
+    for row in questions:
+        print ("Number of Questions:",row)
+    
+    mycursor.execute("show global status like 'com_insert'")
+    com_insert = mycursor.fetchall()
+    #field_names = [i[0] for i in mycursor.description]
+    print(tabulate(com_insert, tablefmt='plain'))
+
+
+    
+
+
+
 
 def fn_memory_usage():
     mycursor.execute("select * from sys.memory_global_total;")
