@@ -43,9 +43,9 @@ def myfunc(argv):
     arg_user = ""
     arg_password = ""
     arg_help = "{0} -s <server> -u <user> -p <password>".format(argv[0])
-    
+
     try:
-        opts, args = getopt.getopt(argv[1:], "hs:u:p:", ["help", "server=", 
+        opts, args = getopt.getopt(argv[1:], "hs:u:p:", ["help", "server=",
         "user=", "password="])
     except:
         print(arg_help)
@@ -107,6 +107,8 @@ def fn_connections():
     field_names = [i[0] for i in mycursor.description]
     print(tabulate(connection_aborted, tablefmt='fancy_grid'))
 
+
+
     #select variable_name,VARIABLE_VALUE from performance_schema.global_status where variable_name = 'Threads_running';
 
 def fn_bufferpool_eff():
@@ -153,29 +155,34 @@ def fn_query():
     print (color.YELLOW + 'Top 10 queries, based on execute count:' + color.END)
     print(tabulate(exe_count, headers=field_names, tablefmt='fancy_grid'))
 
-    mycursor.execute("select variable_value as 'Questions' from performance_schema.global_status where variable_name = 'questions';")
-    questions = mycursor.fetchone()
+    mycursor.execute("show global status like 'questions';")
+    questions = mycursor.fetchall()
     field_names = [i[0] for i in mycursor.description]
-    #print(tabulate(questions, headers=field_names, tablefmt='fancy_grid'))
-    for row in questions:
-        print ("Number of Questions:",row)
-    
+    print(tabulate(questions, tablefmt='fancy_grid'))
+
+    mycursor.execute("show global status like 'com_select'")
+    com_select = mycursor.fetchall()
+    print(tabulate(com_select, tablefmt='fancy_grid'))
+
     mycursor.execute("show global status like 'com_insert'")
     com_insert = mycursor.fetchall()
-    #field_names = [i[0] for i in mycursor.description]
-    print(tabulate(com_insert, tablefmt='plain'))
+    print(tabulate(com_insert, tablefmt='fancy_grid'))
 
+    mycursor.execute(" show global status like 'com_update'")
+    com_update = mycursor.fetchall()
+    print(tabulate(com_update, tablefmt='fancy_grid'))
+
+    mycursor.execute(" show global status like 'com_delete'")
+    com_delete = mycursor.fetchall()
+    print(tabulate(com_delete, tablefmt='fancy_grid')),
 
     
-
-
-
 
 def fn_memory_usage():
     mycursor.execute("select * from sys.memory_global_total;")
     memory_global_total = mycursor.fetchall()
     field_names = [i[0] for i in mycursor.description]
-    print(tabulate(memory_global_total, headers=field_names, tablefmt='fancy_grid'))
+    print(tabulate(memory_global_total, headers=field_names, tablefmt='fancy_grid')),
 
     mycursor.execute("select thread_id,HIGH_NUMBER_OF_BYTES_USED/1024/1024 'MB Used' from performance_schema.memory_summary_by_thread_by_event_name order by HIGH_NUMBER_OF_BYTES_USED desc limit 10")
     memory_by_thread = mycursor.fetchall()
@@ -227,7 +234,7 @@ if __name__=='__main__':
             print(color.BLUE + 'Memory Usage:' + color.END)
             fn_memory_usage()
             fn_main_menu()
-        
+
         elif option == 6:
             print(color.BOLD + 'System Information:' + color.END)
             print('')
