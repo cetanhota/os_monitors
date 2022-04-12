@@ -166,17 +166,23 @@ def fn_query():
 
     mycursor.execute("show global status like 'com_insert'")
     com_insert = mycursor.fetchall()
-    print(tabulate(com_insert, tablefmt='fancy_grid'))
+    insert = (tabulate(com_insert, tablefmt='plain'))
 
     mycursor.execute(" show global status like 'com_update'")
     com_update = mycursor.fetchall()
-    print(tabulate(com_update, tablefmt='fancy_grid'))
+    update = (tabulate(com_update, tablefmt='plain'))
 
     mycursor.execute(" show global status like 'com_delete'")
     com_delete = mycursor.fetchall()
-    print(tabulate(com_delete, tablefmt='fancy_grid')),
+    delete = (tabulate(com_delete, tablefmt='plain'))
+    print(color.YELLOW + delete, update, insert, end = ' ' + color.END)
 
-    
+    delete = (delete.strip('Com_delete'))
+    delete = round(int(delete),2 )
+    print (delete)
+
+
+
 
 def fn_memory_usage():
     mycursor.execute("select * from sys.memory_global_total;")
