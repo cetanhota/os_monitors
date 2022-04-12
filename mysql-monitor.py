@@ -149,40 +149,51 @@ def fn_main_menu():
     clear()
 
 def fn_query():
-    mycursor.execute("select query,db,exec_count,err_count,total_latency,max_latency,avg_latency from sys.statement_analysis where query not like '%commit%' order by exec_count desc limit 10")
+    mycursor.execute("select query,db,exec_count,avg_latency from sys.statement_analysis where query not like '%commit%' order by exec_count desc limit 10")
     exe_count = mycursor.fetchall()
     field_names = [i[0] for i in mycursor.description]
+    print()
     print (color.YELLOW + 'Top 10 queries, based on execute count:' + color.END)
+    print()
     print(tabulate(exe_count, headers=field_names, tablefmt='fancy_grid'))
 
     mycursor.execute("show global status like 'questions';")
     questions = mycursor.fetchall()
-    field_names = [i[0] for i in mycursor.description]
-    print(tabulate(questions, tablefmt='fancy_grid'))
+    questions = (tabulate(questions, tablefmt='plain'))
+    questions = (questions.strip('Questions'))
+    questions = round(int(questions),2 )
 
     mycursor.execute("show global status like 'com_select'")
     com_select = mycursor.fetchall()
-    print(tabulate(com_select, tablefmt='fancy_grid'))
+    select = (tabulate(com_select, tablefmt='plain'))
+    select = (select.strip('Com_select'))
+    select = round(int(select),2 )
 
     mycursor.execute("show global status like 'com_insert'")
     com_insert = mycursor.fetchall()
     insert = (tabulate(com_insert, tablefmt='plain'))
+    insert = (insert.strip('Com_insert'))
+    insert = round(int(insert),2 )
 
     mycursor.execute(" show global status like 'com_update'")
     com_update = mycursor.fetchall()
     update = (tabulate(com_update, tablefmt='plain'))
+    update = (update.strip('Com_update'))
+    update = round(int(update),2 )
 
     mycursor.execute(" show global status like 'com_delete'")
     com_delete = mycursor.fetchall()
     delete = (tabulate(com_delete, tablefmt='plain'))
-    print(color.YELLOW + delete, update, insert, end = ' ' + color.END)
-
     delete = (delete.strip('Com_delete'))
     delete = round(int(delete),2 )
-    print (delete)
-
-
-
+    
+    writes = delete + update + insert
+    print()
+    print(color.YELLOW + 'Read/Write Metrics:' + color.END)
+    print()
+    print ("Questions:", questions)
+    print ("Selects:", select)
+    print ("Writes:", writes)
 
 def fn_memory_usage():
     mycursor.execute("select * from sys.memory_global_total;")
