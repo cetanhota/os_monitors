@@ -69,7 +69,7 @@ host= '192.168.1.61',
 auth_plugin='mysql_native_password',
 user='pi',
 password='hawk69')
-global mycursor
+#global mycursor
 mycursor = mydb.cursor()
 
 def fn_processlist():
@@ -186,7 +186,7 @@ def fn_query():
     delete = (tabulate(com_delete, tablefmt='plain'))
     delete = (delete.strip('Com_delete'))
     delete = round(int(delete),2 )
-    
+
     writes = delete + update + insert
     print()
     print(color.YELLOW + 'Read/Write Metrics:' + color.END)
@@ -197,6 +197,7 @@ def fn_query():
 
 def fn_memory_usage():
     mycursor.execute("select * from sys.memory_global_total;")
+    print("Something went wrong: {}".format(err))
     memory_global_total = mycursor.fetchall()
     field_names = [i[0] for i in mycursor.description]
     print(tabulate(memory_global_total, headers=field_names, tablefmt='fancy_grid')),
