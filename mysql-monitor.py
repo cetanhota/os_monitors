@@ -28,7 +28,7 @@ menu_options = {
     3: 'Innodb Buffer Pool Information',
     4: 'Query Information',
     5: 'Memory Usage',
-    6: '',
+    6: 'Global IO Waits',
     7: '',
     0: 'Exit'
 }
@@ -69,7 +69,6 @@ host= '192.168.1.61',
 auth_plugin='mysql_native_password',
 user='pi',
 password='hawk69')
-#global mycursor
 mycursor = mydb.cursor()
 
 def fn_processlist():
@@ -77,7 +76,6 @@ def fn_processlist():
     mycursor.execute(query)
     results = mycursor.fetchall()
     field_names = [i[0] for i in mycursor.description]
-
     print(tabulate(results, headers=field_names, tablefmt='fancy_grid'))
 
 def fn_connections():
@@ -106,10 +104,6 @@ def fn_connections():
     connection_aborted = mycursor.fetchall()
     field_names = [i[0] for i in mycursor.description]
     print(tabulate(connection_aborted, tablefmt='fancy_grid'))
-
-
-
-    #select variable_name,VARIABLE_VALUE from performance_schema.global_status where variable_name = 'Threads_running';
 
 def fn_bufferpool_eff():
     print()
@@ -161,31 +155,31 @@ def fn_query():
     questions = mycursor.fetchall()
     questions = (tabulate(questions, tablefmt='plain'))
     questions = (questions.strip('Questions'))
-    questions = round(int(questions),2 )
+    questions = int(questions)
 
     mycursor.execute("show global status like 'com_select'")
     com_select = mycursor.fetchall()
     select = (tabulate(com_select, tablefmt='plain'))
     select = (select.strip('Com_select'))
-    select = round(int(select),2 )
+    select = int(select)
 
     mycursor.execute("show global status like 'com_insert'")
     com_insert = mycursor.fetchall()
     insert = (tabulate(com_insert, tablefmt='plain'))
     insert = (insert.strip('Com_insert'))
-    insert = round(int(insert),2 )
+    insert = int(insert)
 
     mycursor.execute(" show global status like 'com_update'")
     com_update = mycursor.fetchall()
     update = (tabulate(com_update, tablefmt='plain'))
     update = (update.strip('Com_update'))
-    update = round(int(update),2 )
+    update = int(update)
 
     mycursor.execute(" show global status like 'com_delete'")
     com_delete = mycursor.fetchall()
     delete = (tabulate(com_delete, tablefmt='plain'))
     delete = (delete.strip('Com_delete'))
-    delete = round(int(delete),2 )
+    delete = int(delete)
 
     writes = delete + update + insert
     print()
@@ -195,9 +189,14 @@ def fn_query():
     print ("Selects:", select)
     print ("Writes:", writes)
 
+def fn_global_io_waits():
+    mycursor.execute("select * from sys.waits_global_by_latency;")
+    memory_global_total = mycursor.fetchall()
+    field_names = [i[0] for i in mycursor.description]
+    print(tabulate(memory_global_total, headers=field_names, tablefmt='fancy_grid'))
+
 def fn_memory_usage():
     mycursor.execute("select * from sys.memory_global_total;")
-    print("Something went wrong: {}".format(err))
     memory_global_total = mycursor.fetchall()
     field_names = [i[0] for i in mycursor.description]
     print(tabulate(memory_global_total, headers=field_names, tablefmt='fancy_grid')),
@@ -207,6 +206,7 @@ def fn_memory_usage():
     print(color.YELLOW + 'Memory Used per Thread:' + color.END)
     field_names = [i[0] for i in mycursor.description]
     print(tabulate(memory_by_thread, headers=field_names, tablefmt='fancy_grid'))
+
 if __name__=='__main__':
     #myfunc(sys.argv)
     clear()
@@ -252,21 +252,11 @@ if __name__=='__main__':
             print(color.BLUE + 'Memory Usage:' + color.END)
             fn_memory_usage()
             fn_main_menu()
-
         elif option == 6:
-            print(color.BOLD + 'System Information:' + color.END)
-            print('')
-
-            print('')
-
-            print('')
-
-            print('')
-
-            print('')
-
-            print('')
-            input("Press Enter to return to menu.")
+            clear()
+            print(color.BLUE + 'Global IO Waits' + color.END)
+            fn_global_io_waits()
+            fn_main_menu()
         elif option == 7:
             print(color.BOLD + 'CPU Usage:' + color.END)
             clear()
