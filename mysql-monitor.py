@@ -29,7 +29,6 @@ menu_options = {
     4: 'Query Information',
     5: 'Memory Usage',
     6: 'Global IO Waits',
-    7: '',
     0: 'Exit'
 }
 
@@ -203,9 +202,16 @@ def fn_memory_usage():
 
     mycursor.execute("select thread_id,HIGH_NUMBER_OF_BYTES_USED/1024/1024 'MB Used' from performance_schema.memory_summary_by_thread_by_event_name order by HIGH_NUMBER_OF_BYTES_USED desc limit 10")
     memory_by_thread = mycursor.fetchall()
+    print()
     print(color.YELLOW + 'Memory Used per Thread:' + color.END)
     field_names = [i[0] for i in mycursor.description]
     print(tabulate(memory_by_thread, headers=field_names, tablefmt='fancy_grid'))
+    print()
+    print(color.YELLOW + 'Bufferpool Memory Breakdown:' + color.END)
+    mycursor.execute("SELECT * FROM sys.memory_global_by_current_bytes WHERE event_name LIKE 'memory/innodb/buf_buf_pool';")
+    innodb_bufpool = mycursor.fetchall()
+    field_names = [i[0] for i in mycursor.description]
+    print(tabulate(innodb_bufpool, headers=field_names, tablefmt='fancy_grid'))
 
 if __name__=='__main__':
     #myfunc(sys.argv)
@@ -257,17 +263,10 @@ if __name__=='__main__':
             print(color.BLUE + 'Global IO Waits' + color.END)
             fn_global_io_waits()
             fn_main_menu()
-        elif option == 7:
-            print(color.BOLD + 'CPU Usage:' + color.END)
-            clear()
-            print('')
-
-            print('')
-            input("Press Enter to return to menu.")
         elif option == 0:
              clear()
              print('Have a Nice Day!')
              mydb.close()
              exit()
         else:
-             print('Invalid option. Please enter a number between 0 and 7.')
+             print('Invalid option. Please enter a number between 0 and 6.')
