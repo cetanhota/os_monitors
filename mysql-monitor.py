@@ -32,42 +32,23 @@ menu_options = {
     0: 'Exit'
 }
 
+server=sys.argv[1]
+user=sys.argv[2]
+password=sys.argv[3]
+
 def print_menu():
     for key in menu_options.keys():
         print (key, '--', menu_options[key] )
 HOST = socket.gethostname()
 
-def myfunc(argv):
-    arg_server = ""
-    arg_user = ""
-    arg_password = ""
-    arg_help = "{0} -s <server> -u <user> -p <password>".format(argv[0])
-
-    try:
-        opts, args = getopt.getopt(argv[1:], "hs:u:p:", ["help", "server=",
-        "user=", "password="])
-    except:
-        print(arg_help)
-        sys.exit(2)
-        for opt, arg in opts:
-            if opt in ("-h", "--help"):
-                print(arg_help)  # print the help message
-                sys.exit(2)
-            elif opt in ("-s", "--server"):
-                arg_server = arg
-            elif opt in ("-u", "--user"):
-                arg_user = arg
-            elif opt in ("-p", "--password"):
-                arg_password = arg
-
 def clear():
     os.system('clear')
 
 mydb = mysql.connector.connect(
-host= '192.168.1.61',
+host= server,
 auth_plugin='mysql_native_password',
-user='pi',
-password='hawk69')
+user= user,
+password=password)
 mycursor = mydb.cursor()
 
 def fn_processlist():
