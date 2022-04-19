@@ -11,7 +11,6 @@ import time
 import os
 import psutil
 import sys
-import getopt
 
 class color:
         BOLD = '\033[1m'
