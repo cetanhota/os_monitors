@@ -34,6 +34,9 @@ menu_options = {
     0: 'Exit'
 }
 
+if len(sys.argv) < 4:
+    print ('Usage:', sys.argv[0], 'server user password')
+    sys.exit(1)  # abort because of error
 server=sys.argv[1]
 user=sys.argv[2]
 password=sys.argv[3]
@@ -119,8 +122,8 @@ def fn_bufferpool_eff():
         print ("Innodb_buffer_pool_reads:", row2)
 
     print()
-    print (Color.YELLOW + "Only",round(int(row2)/int(row1) * 100, 2),"% of Buffer Pool reads come from disk." \
-        + Color.END)
+    print (Color.YELLOW + "Only",round(int(row2)/int(row1) * 100, 2),
+    "% of Buffer Pool reads come from disk." + Color.END)
     print()
     mycursor.execute("select variable_value \
         from performance_schema.global_status \
@@ -221,8 +224,9 @@ def fn_memory_usage():
     fnm_field_names = [i[0] for i in mycursor.description]
     print(tabulate(memory_global_total, headers=fnm_field_names, tablefmt='fancy_grid'))
 
-    mycursor.execute("select thread_id,HIGH_NUMBER_OF_BYTES_USED/1024/1024 'MB Used' from \
-        performance_schema.memory_summary_by_thread_by_event_name order by HIGH_NUMBER_OF_BYTES_USED desc limit 10")
+    mycursor.execute("select thread_id,HIGH_NUMBER_OF_BYTES_USED/1024/1024 'MB Used' \
+        from performance_schema.memory_summary_by_thread_by_event_name order\
+             by HIGH_NUMBER_OF_BYTES_USED desc limit 10")
     memory_by_thread = mycursor.fetchall()
     print()
     print(Color.YELLOW + 'Memory Used per Thread:' + Color.END)
@@ -235,6 +239,16 @@ def fn_memory_usage():
     innodb_bufpool = mycursor.fetchall()
     fnmt_field_names = [i[0] for i in mycursor.description]
     print(tabulate(innodb_bufpool, headers=fnmt_field_names, tablefmt='fancy_grid'))
+
+    mycursor.execute("SELECT ( @@read_buffer_size \
+    + @@read_rnd_buffer_size + @@sort_buffer_size \
+    + @@join_buffer_size + @@binlog_cache_size + @@thread_stack \
+    + @@tmp_table_size \
+    + 2*@@net_buffer_length) / (1024 * 1024) AS 'Max memory per Connection.';")
+    mem_by_conn = mycursor.fetchall()
+    mbc_field_names = [i[0] for i in mycursor.description]
+    print(tabulate(mem_by_conn, headers=mbc_field_names, tablefmt='fancy_grid'))
+
 
 if __name__=='__main__':
     clear()
