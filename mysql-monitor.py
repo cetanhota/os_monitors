@@ -35,7 +35,7 @@ menu_options = {
 }
 
 if len(sys.argv) < 4:
-    print ('Usage:', sys.argv[0], 'server user password')
+    print (Color.RED + 'Usage:', sys.argv[0], 'server user password' + Color.END)
     sys.exit(1)  # abort because of error
 server=sys.argv[1]
 user=sys.argv[2]
