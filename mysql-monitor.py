@@ -31,6 +31,7 @@ menu_options = {
     4: 'Query Information',
     5: 'Memory Usage',
     6: 'Global IO Waits',
+    7: 'MySQL System Summary',
     0: 'Exit'
 }
 
@@ -299,6 +300,22 @@ if __name__=='__main__':
             print(Color.BLUE + 'Global IO Waits' + Color.END)
             fn_global_io_waits()
             fn_main_menu()
+        elif OPTION == 7:
+            clear()
+            print(Color.BLUE + 'MySQL Summary' + Color.END)
+            print(Color.BLUE + 'Processlist:' + Color.END)
+            fn_processlist()
+            print(Color.BLUE + 'Connection Information:' + Color.END)
+            fn_connections()
+            print(Color.BLUE + 'Buffer Pool Information:' + Color.END)
+            fn_bufferpool_eff()
+            print(Color.BLUE + 'Query Information:' + Color.END)
+            fn_query()
+            print(Color.BLUE + 'Memory Usage:' + Color.END)
+            fn_memory_usage()
+            print(Color.BLUE + 'Global IO Waits' + Color.END)
+            fn_global_io_waits()
+            fn_main_menu()
         elif OPTION == 0:
             clear()
             print('Have a Nice Day!')
@@ -306,5 +323,4 @@ if __name__=='__main__':
             sys.exit()
             break
     else:
-        print('Invalid option. Please enter a number between 0 and 6.')
-        
+        print('Invalid option. Please enter a number between 0 and 7.')
