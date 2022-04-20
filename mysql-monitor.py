@@ -12,7 +12,7 @@ import sys
 import mysql.connector
 from tabulate import tabulate
 
-class Color:
+class Color: # pylint: disable=too-few-public-methods
     '''
     colors
     '''
@@ -266,7 +266,7 @@ if __name__=='__main__':
         OPTION = ''
         try:
             OPTION = int(input('Enter your choice: '))
-        except:
+        except: # pylint: disable=bare-except
             print('Wrong input. Please enter a number ...')
             #Check what choice was entered and act accordingly
         if OPTION == 1:
@@ -307,3 +307,4 @@ if __name__=='__main__':
             break
     else:
         print('Invalid option. Please enter a number between 0 and 6.')
+        
