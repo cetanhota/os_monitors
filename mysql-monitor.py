@@ -36,9 +36,17 @@ menu_options = {
     0: 'Exit'
 }
 
+#if len(sys.argv) < 4:
+#    print (Color.RED + 'Usage:', sys.argv[0], 'server user password' + Color.END)
+#    sys.exit(1)  # abort because of error
+#server=sys.argv[1]
+#user=sys.argv[2]
+#password=sys.argv[3]
+
 os.system('clear')
-print(Color.YELLOW + "MySQL Monitor" + Color.END)
-print (Color.YELLOW + "Enter Connection Details: " + Color.END)
+print(Color.BLUE + "MySQL Monitor" + Color.END)
+print (Color.BLUE + "Enter Connection Information: " + Color.END)
+print (Color.BLUE + "----------------------------- " + Color.END)
 print()
 
 mydb = mysql.connector.connect(
@@ -54,6 +62,7 @@ def print_menu():
     '''
     for key in menu_options.keys():
         print (key, '--', menu_options[key] )
+
 HOST = socket.gethostname()
 
 def clear():
@@ -126,11 +135,11 @@ def fn_bufferpool_eff():
     row2 = ''
     for row2 in bpoolr:
         print ("Innodb_buffer_pool_reads:", row2)
-
     print()
-    print (Color.YELLOW + "Only",round(int(row2)/int(row1) * 100, 2),
-    "% of Buffer Pool reads come from disk." + Color.END)
-    print()
+    bprd = round(int(row2)/int(row1) * 100)
+    bprd = 100 - bprd
+    print (Color.YELLOW + 'Reads from Buffer Pool: ', bprd, '%' + Color.END)
+    print ()
     mycursor.execute("select variable_value \
         from performance_schema.global_status \
             where variable_name = 'Innodb_buffer_pool_pages_total'")
@@ -152,6 +161,22 @@ def fn_bufferpool_eff():
     bp_tot_used = round(bp_tot_used * 100, 2)
     print()
     print (Color.YELLOW + "Buffer Pool Utilization: ", bp_tot_used, "%" + Color.END)
+
+    query = "select * from sys.x$innodb_buffer_stats_by_schema"
+    mycursor.execute(query)
+    results = mycursor.fetchall()
+    sbs_field_names = [i[0] for i in mycursor.description]
+    print()
+    print(Color.BLUE + "Innodb Buffer Stats by Schema." + Color.END)
+    print(tabulate(results, headers=sbs_field_names, tablefmt='fancy_grid'))
+
+    query = "select * from sys.x$innodb_buffer_stats_by_table where object_schema not in ('mysql','sys');"
+    mycursor.execute(query)
+    results = mycursor.fetchall()
+    sbt_field_names = [i[0] for i in mycursor.description]
+    print()
+    print(Color.BLUE + "Innodb Buffer Stats by Table." + Color.END)
+    print(tabulate(results, headers=sbt_field_names, tablefmt='fancy_grid'))
 
 def fn_main_menu():
     '''
@@ -250,11 +275,15 @@ def fn_memory_usage():
     + @@read_rnd_buffer_size + @@sort_buffer_size \
     + @@join_buffer_size + @@binlog_cache_size + @@thread_stack \
     + @@tmp_table_size \
-    + 2*@@net_buffer_length) / (1024 * 1024) AS 'Max memory per Connection.';")
-    mem_by_conn = mycursor.fetchall()
-    mbc_field_names = [i[0] for i in mycursor.description]
-    print(tabulate(mem_by_conn, headers=mbc_field_names, tablefmt='fancy_grid'))
-
+    + 2*@@net_buffer_length) / (1024 * 1024) AS 'Max memory in MB per Connection.';")
+    mem_by_conn = ''
+    mem_by_conn = mycursor.fetchone()
+    #mbc_field_names = [i[0] for i in mycursor.description]
+    for max_memory_connection in mem_by_conn:
+        max_memory_connection = round(int(max_memory_connection),2)
+        print()
+        print(Color.YELLOW + 'Max Memory per connection: ', max_memory_connection, 'MB' + Color.END)
+        print(Color.YELLOW + 'Avg Memory per connection: ', max_memory_connection / 2, 'MB' + Color.END)
 
 if __name__=='__main__':
     clear()
