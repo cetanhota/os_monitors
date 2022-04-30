@@ -9,6 +9,7 @@ import socket
 import time
 import os
 import sys
+from getpass import getpass
 import mysql.connector
 from tabulate import tabulate
 
@@ -35,18 +36,16 @@ menu_options = {
     0: 'Exit'
 }
 
-if len(sys.argv) < 4:
-    print (Color.RED + 'Usage:', sys.argv[0], 'server user password' + Color.END)
-    sys.exit(1)  # abort because of error
-server=sys.argv[1]
-user=sys.argv[2]
-password=sys.argv[3]
+os.system('clear')
+print(Color.YELLOW + "MySQL Monitor" + Color.END)
+print (Color.YELLOW + "Enter Connection Details: " + Color.END)
+print()
 
 mydb = mysql.connector.connect(
-host= server,
+host=input("Enter Server Name: "),
 auth_plugin='mysql_native_password',
-user= user,
-password=password)
+user=input("Enter User: "),
+password=getpass("Enter Password: "))
 mycursor = mydb.cursor()
 
 def print_menu():
@@ -81,10 +80,16 @@ def fn_connections():
         host,COUNT(1) Connections FROM ( SELECT user usr,LEFT(host,LOCATE (':',host) - 1) hst \
             FROM information_schema.processlist WHERE user NOT IN ('system user','root')) \
                 A GROUP BY usr,hst WITH ROLLUP;"
-    mycursor.execute(query)
-    results = mycursor.fetchall()
-    fnc1_field_names = [i[0] for i in mycursor.description]
-    print(tabulate(results, headers=fnc1_field_names, tablefmt='fancy_grid'))
+    try:
+        mycursor.execute(query)
+        results = mycursor.fetchall()
+    except mysql.connector.Error as err:
+        print(Color.RED + "Error Code:" + Color.END, err.errno)
+        print(Color.RED + "SQLSTATE" + Color.END, err.sqlstate)
+        print(Color.RED + "Message" + Color.END, err.msg)
+    else:
+        fnc1_field_names = [i[0] for i in mycursor.description]
+        print(tabulate(results, headers=fnc1_field_names, tablefmt='fancy_grid'))
 
     mycursor.execute("show global status like 'threads_connected'")
     threads_connected = mycursor.fetchall()
@@ -161,7 +166,7 @@ def fn_query():
     query info
     '''
     mycursor.execute("select query,db,exec_count,avg_latency from sys.statement_analysis \
-        where query not like '%commit%' order by exec_count desc limit 10")
+    where query not like '%commit%' order by exec_count desc limit 10")
     exe_count = mycursor.fetchall()
     fnq_field_names = [i[0] for i in mycursor.description]
     print()
@@ -259,7 +264,10 @@ if __name__=='__main__':
         version = mycursor.fetchall()
         ver_field_names = [i[0] for i in mycursor.description]
         print(tabulate(version, headers=ver_field_names, tablefmt='fancy_grid'))
-
+        mycursor.execute("select @@hostname as 'MySQL Server';")
+        server_name = mycursor.fetchall()
+        server_field_names = [i[0] for i in mycursor.description]
+        print(tabulate(server_name, headers=server_field_names, tablefmt='fancy_grid'))
         print ('Python Version is:',sys.version[0:5])
         print('Date and Time:',time.asctime())
         print(Color.YELLOW + '\nChoose Option:' + Color.END)
