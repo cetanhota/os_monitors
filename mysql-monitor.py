@@ -190,16 +190,17 @@ def fn_query():
     '''
     query info
     '''
-    mycursor.execute("select query,db,exec_count,avg_latency from sys.statement_analysis \
+    query = ("select query,db,exec_count,avg_latency from sys.statement_analysis \
     where query not like '%commit%' order by exec_count desc limit 10")
     try:
+        mycursor.execute(query)
         exe_count = mycursor.fetchall()
-        fnq_field_names = [i[0] for i in mycursor.description]
     except mysql.connector.Error as err:
         print(Color.RED + "Error Code:" + Color.END, err.errno)
         print(Color.RED + "SQLSTATE" + Color.END, err.sqlstate)
         print(Color.RED + "Message" + Color.END, err.msg)
     else:
+        fnq_field_names = [i[0] for i in mycursor.description]
         print()
         print (Color.YELLOW + 'Top 10 queries, based on execute count:' + Color.END)
         print()
