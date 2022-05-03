@@ -195,10 +195,10 @@ def fn_query():
     try:
         mycursor.execute(query)
         exe_count = mycursor.fetchall()
-    except mysql.connector.Error as err:
+    except mysql.connector.errors as err:
         print(Color.RED + "Error Code:" + Color.END, err.errno)
-        print(Color.RED + "SQLSTATE" + Color.END, err.sqlstate)
-        print(Color.RED + "Message" + Color.END, err.msg)
+        print(Color.RED + "SQLSTATE:" + Color.END, err.sqlstate)
+        print(Color.RED + "Message:" + Color.END, err.msg)
     else:
         fnq_field_names = [i[0] for i in mycursor.description]
         print()
