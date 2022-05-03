@@ -292,6 +292,7 @@ def fn_memory_usage():
         print(Color.YELLOW + 'Max Memory per connection: ', max_memory_connection, 'MB' + Color.END)
         print(Color.YELLOW + 'Avg Memory per connection: ', max_memory_connection / 2, 'MB' + Color.END)
 
+
 if __name__=='__main__':
     clear()
     while True:
