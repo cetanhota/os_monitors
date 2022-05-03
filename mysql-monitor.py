@@ -296,7 +296,8 @@ if __name__=='__main__':
     clear()
     while True:
         print(Color.YELLOW + 'MySQL Monitor' + Color.END)
-        mycursor.execute("select mysql_version from sys.version;")
+        query = "select mysql_version from sys.version;"
+        mycursor.execute(query)
         version = mycursor.fetchall()
         ver_field_names = [i[0] for i in mycursor.description]
         print(tabulate(version, headers=ver_field_names, tablefmt='fancy_grid'))
