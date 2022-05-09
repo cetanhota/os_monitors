@@ -5,9 +5,10 @@
 @author: wayne
 """""
 
-import socket
 import time
 import os
+from os.path import exists
+from pathlib import Path
 import sys
 from getpass import getpass
 import mysql.connector
@@ -49,12 +50,21 @@ print (Color.BLUE + "Enter Connection Information: " + Color.END)
 print (Color.BLUE + "----------------------------- " + Color.END)
 print()
 
-mydb = mysql.connector.connect(
-host=input("Enter Server Name: "),
-auth_plugin='mysql_native_password',
-user=input("Enter User: "),
-password=getpass("Enter Password: "))
-mycursor = mydb.cursor()
+HOME = str(Path.home()) + '/.my.cnf'
+if exists(HOME):
+    mydb = mysql.connector.connect(
+    host=input("Enter Server Name: "),
+    auth_plugin='mysql_native_password',
+    option_files='/home/pi/.my.cnf',
+    option_groups='connector_python')
+    mycursor = mydb.cursor()
+else:
+    mydb = mysql.connector.connect(
+    host=input("Enter Server Name: "),
+    auth_plugin='mysql_native_password',
+    user=input("Enter User: "),
+    password=getpass("Enter Password: "))
+    mycursor = mydb.cursor()
 
 def print_menu():
     '''
@@ -62,8 +72,6 @@ def print_menu():
     '''
     for key in menu_options.keys():
         print (key, '--', menu_options[key] )
-
-HOST = socket.gethostname()
 
 def clear():
     '''
@@ -75,8 +83,7 @@ def fn_processlist():
     '''
     show processlist
     '''
-    query = "show processlist"
-    mycursor.execute(query)
+    mycursor.execute("show processlist")
     results = mycursor.fetchall()
     pl_field_names = [i[0] for i in mycursor.description]
     print(tabulate(results, headers=pl_field_names, tablefmt='fancy_grid'))
@@ -85,12 +92,11 @@ def fn_connections():
     '''
     show connections
     '''
-    query = "SELECT IFNULL(usr,'All Users') user,IFNULL(hst,'All Hosts') \
+    try:
+        mycursor.execute("SELECT IFNULL(usr,'All Users') user,IFNULL(hst,'All Hosts') \
         host,COUNT(1) Connections FROM ( SELECT user usr,LEFT(host,LOCATE (':',host) - 1) hst \
             FROM information_schema.processlist WHERE user NOT IN ('system user','root')) \
-                A GROUP BY usr,hst WITH ROLLUP;"
-    try:
-        mycursor.execute(query)
+                A GROUP BY usr,hst WITH ROLLUP;")
         results = mycursor.fetchall()
     except mysql.connector.Error as err:
         print(Color.RED + "Error Code:" + Color.END, err.errno)
@@ -162,16 +168,16 @@ def fn_bufferpool_eff():
     print()
     print (Color.YELLOW + "Buffer Pool Utilization: ", bp_tot_used, "%" + Color.END)
 
-    query = "select * from sys.x$innodb_buffer_stats_by_schema"
-    mycursor.execute(query)
+    mycursor.execute("select * from sys.x$innodb_buffer_stats_by_schema")
     results = mycursor.fetchall()
     sbs_field_names = [i[0] for i in mycursor.description]
     print()
     print(Color.BLUE + "Innodb Buffer Stats by Schema." + Color.END)
     print(tabulate(results, headers=sbs_field_names, tablefmt='fancy_grid'))
 
-    query = "select * from sys.x$innodb_buffer_stats_by_table where object_schema not in ('mysql','sys');"
-    mycursor.execute(query)
+    mycursor.execute("select * from sys.x$innodb_buffer_stats_by_table \
+        where object_schema \
+            not in ('mysql','sys');")
     results = mycursor.fetchall()
     sbt_field_names = [i[0] for i in mycursor.description]
     print()
@@ -290,15 +296,13 @@ def fn_memory_usage():
         max_memory_connection = round(int(max_memory_connection),2)
         print()
         print(Color.YELLOW + 'Max Memory per connection: ', max_memory_connection, 'MB' + Color.END)
-        print(Color.YELLOW + 'Avg Memory per connection: ', max_memory_connection / 2, 'MB' + Color.END)
-
+        print(Color.YELLOW + 'Avg Memory per connection: ', max_memory_connection/2,'MB'+ Color.END)
 
 if __name__=='__main__':
     clear()
     while True:
         print(Color.YELLOW + 'MySQL Monitor' + Color.END)
-        query = "select mysql_version from sys.version;"
-        mycursor.execute(query)
+        mycursor.execute("select mysql_version from sys.version;")
         version = mycursor.fetchall()
         ver_field_names = [i[0] for i in mycursor.description]
         print(tabulate(version, headers=ver_field_names, tablefmt='fancy_grid'))
