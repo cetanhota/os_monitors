@@ -50,12 +50,12 @@ print (Color.BLUE + "Enter Connection Information: " + Color.END)
 print (Color.BLUE + "----------------------------- " + Color.END)
 print()
 
-HOME = str(Path.home()) + '/.my.cnf'
-if exists(HOME):
+CNFHOME = str(Path.home()) + '/.my.cnf'
+if exists(CNFHOME):
     mydb = mysql.connector.connect(
     host=input("Enter Server Name: "),
     auth_plugin='mysql_native_password',
-    option_files='/home/pi/.my.cnf',
+    option_files=CNFHOME,
     option_groups='connector_python')
     mycursor = mydb.cursor()
 else:
