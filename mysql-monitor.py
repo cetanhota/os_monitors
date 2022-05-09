@@ -196,10 +196,9 @@ def fn_query():
     '''
     query info
     '''
-    query = ("select query,db,exec_count,avg_latency from sys.statement_analysis \
-    where query not like '%commit%' order by exec_count desc limit 10")
     try:
-        mycursor.execute(query)
+        mycursor.execute("select query,db,exec_count,avg_latency from sys.statement_analysis \
+            where query not like '%commit%' order by exec_count desc limit 10")
         exe_count = mycursor.fetchall()
     except mysql.connector.Error as err:
         print(Color.RED + "Error Code:" + Color.END, err.errno)
@@ -306,10 +305,12 @@ if __name__=='__main__':
         version = mycursor.fetchall()
         ver_field_names = [i[0] for i in mycursor.description]
         print(tabulate(version, headers=ver_field_names, tablefmt='fancy_grid'))
+
         mycursor.execute("select @@hostname as 'MySQL Server';")
         server_name = mycursor.fetchall()
         server_field_names = [i[0] for i in mycursor.description]
         print(tabulate(server_name, headers=server_field_names, tablefmt='fancy_grid'))
+
         print ('Python Version is:',sys.version[0:5])
         print('Date and Time:',time.asctime())
         print(Color.YELLOW + '\nChoose Option:' + Color.END)
