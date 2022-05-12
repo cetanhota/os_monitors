@@ -301,10 +301,16 @@ if __name__=='__main__':
     clear()
     while True:
         print(Color.YELLOW + 'MySQL Monitor' + Color.END)
-        mycursor.execute("select mysql_version from sys.version;")
-        version = mycursor.fetchall()
-        ver_field_names = [i[0] for i in mycursor.description]
-        print(tabulate(version, headers=ver_field_names, tablefmt='fancy_grid'))
+        try:
+            mycursor.execute("select mysql_version from sys.version;")
+            version = mycursor.fetchall()
+        except mysql.connector.Error as err:
+            print(Color.RED + "Error Code:" + Color.END, err.errno)
+            print(Color.RED + "SQLSTATE:" + Color.END, err.sqlstate)
+            print(Color.RED + "Message:" + Color.END, err.msg)
+        else:
+            ver_field_names = [i[0] for i in mycursor.description]
+            print(tabulate(version, headers=ver_field_names, tablefmt='fancy_grid'))
 
         mycursor.execute("select @@hostname as 'MySQL Server';")
         server_name = mycursor.fetchall()
@@ -381,3 +387,7 @@ if __name__=='__main__':
             break
     else:
         print('Invalid option. Please enter a number between 0 and 7.')
+
+if __name__=='__nomenu__':
+    fn_processlist()
+
