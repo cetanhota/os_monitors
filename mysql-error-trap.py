@@ -12,6 +12,7 @@ try:
     with connect(
         host=input("localhost"),
         user=input("Enter username: "),
+        auth_plugin='mysql_native_password',
         password=getpass("Enter password: "),
     ) as connection:
         print(connection)
