@@ -1,9 +1,9 @@
-#!/usr/bin/env python3
+#!/usr/bin/env python3.11
 # -*- coding: utf-8 -*-
 """""
 3/14/2022
 @author: wayne
-""" ""
+"""""
 
 import socket
 import time
@@ -62,13 +62,11 @@ if exists(MYLOGINCNF):
     myloginconf = myloginpath.parse("client")
     mydb = mysql.connector.connect(
     **myloginconf,
-    host=SERVER,
-    auth_plugin='mysql_native_password')
+    host=SERVER)
     mycursor = mydb.cursor()
 else:
     mydb = mysql.connector.connect(
     host=SERVER,
-    auth_plugin='mysql_native_password',
     user=input("Enter User: "),
     password=getpass("Enter Password: "))
     mycursor = mydb.cursor()
@@ -380,11 +378,11 @@ if __name__ == "__main__":
     clear()
     while True:
         print(Color.YELLOW + "MySQL Monitor" + Color.END)
-        MYSQLVER = "select mysql_version from sys.version;"
+        MYSQLVER = "select @@version as version;"
         try:
             mycursor.execute(MYSQLVER)
             version = mycursor.fetchall()
-        except mysql.connector.error as err:
+        except mysql.connector.Error as err:
             print(Color.RED + "Error Code:" + Color.END, err.errno)
             print(Color.RED + "SQLSTATE:" + Color.END, err.sqlstate)
             print(Color.RED + "Message:" + Color.END, err.msg)
